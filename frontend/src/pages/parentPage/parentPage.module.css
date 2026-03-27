@@ -1,0 +1,195 @@
+.container {
+  min-height: 100vh;
+  background-color: #F0F7F4; /* Το ίδιο παστέλ mint background */
+  padding: 40px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+}
+
+.content {
+  width: 100%;
+  max-width: 1000px;
+}
+
+/* --- Κάρτα Προφίλ --- */
+.profileCard {
+  background-color: #FFFFFF;
+  border-radius: 20px;
+  padding: 25px 30px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(42, 75, 64, 0.04);
+  margin-bottom: 30px;
+}
+
+.avatar {
+  font-size: 50px;
+  margin-right: 20px;
+  background-color: #E6F2ED;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.profileInfo h2 {
+  margin: 0 0 5px 0;
+  color: #2A4B40;
+  font-size: 24px;
+}
+
+.profileInfo p {
+  margin: 0;
+  color: #5C7C71;
+  font-size: 15px;
+}
+
+/* --- Grid για Φόρμα και Λίστα --- */
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+@media (max-width: 768px) {
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Κάρτες γενικά --- */
+.formCard, .capsListCard {
+  background-color: #FFFFFF;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 15px rgba(42, 75, 64, 0.04);
+}
+
+.formCard h3, .capsListCard h3 {
+  color: #2A4B40;
+  margin: 0 0 5px 0;
+  font-size: 20px;
+}
+
+.subtitle {
+  color: #5C7C71;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+
+/* --- Φόρμα --- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup label {
+  color: #2A4B40;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.formGroup input, .formGroup select {
+  padding: 12px 15px;
+  border: 1px solid #CDE4DB;
+  border-radius: 12px;
+  font-size: 15px;
+  color: #2A4B40;
+  background-color: #FAFDFB;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.formGroup input:focus, .formGroup select:focus {
+  border-color: #5A9C86;
+}
+
+.submitBtn {
+  background-color: #5A9C86;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+}
+
+.submitBtn:hover {
+  background-color: #3B7A65;
+}
+
+/* --- Λίστα Ορίων --- */
+.capsList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.capItem {
+  background-color: #F8FAFC;
+  border: 1px solid #E6F2ED;
+  padding: 15px 20px;
+  border-radius: 16px;
+}
+
+.capHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.capCategory {
+  font-weight: 600;
+  color: #2A4B40;
+}
+
+.capPeriod {
+  font-size: 12px;
+  background-color: #E6F2ED;
+  color: #3B7A65;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.capAmounts {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #5C7C71;
+  margin-bottom: 8px;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background-color: #E2E8F0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #F28C28; /* Χρώμα που δείχνει κατανάλωση */
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+.icon {
+  font-size: 55px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+}

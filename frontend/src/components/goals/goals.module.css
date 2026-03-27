@@ -1,0 +1,105 @@
+.goalsWidget {
+  background-color: transparent;
+  width: 100%;
+  max-width: 450px; /* Για να μην απλώνει υπερβολικά σε μεγάλες οθόνες */
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  color: #2A4B40;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.newBtn {
+  text-decoration: none;
+  color: #5A9C86; /* Το teal μας */
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.newBtn:hover {
+  color: #3B7A65;
+}
+
+.goalsList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Απόσταση ανάμεσα στις κάρτες */
+}
+
+.goalCard {
+  background-color: #FAFDFB; /* Σπασμένο λευκό */
+  border: 1px solid #E6F2ED;
+  border-radius: 20px;
+  padding: 15px 20px;
+  box-shadow: 0 4px 12px rgba(42, 75, 64, 0.03);
+  transition: transform 0.2s ease;
+}
+
+.goalCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(42, 75, 64, 0.06);
+}
+
+.goalInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.emojiBox {
+  font-size: 24px;
+  margin-right: 15px;
+  background-color: #F0F7F4;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+}
+
+.textDetails {
+  flex-grow: 1; /* Πιάνει τον διαθέσιμο χώρο, σπρώχνοντας το ποσοστό δεξιά */
+}
+
+.goalTitle {
+  margin: 0 0 4px 0;
+  color: #2A4B40;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.amounts {
+  color: #7B968B;
+  font-size: 13px;
+}
+
+.percentage {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* --- Μπάρα Προόδου --- */
+.progressBarTrack {
+  width: 100%;
+  height: 8px;
+  background-color: #E6F2ED; /* Το background της μπάρας */
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.8s ease-out; /* Ωραίο animation όταν φορτώνει */
+}

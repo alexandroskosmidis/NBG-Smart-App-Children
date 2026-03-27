@@ -1,0 +1,104 @@
+.transactionsWidget {
+  width: 100%;
+  max-width: 450px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.title {
+  color: #0F172A; /* Πολύ σκούρο μπλε-γκρι */
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.seeAllBtn {
+  text-decoration: none;
+  color: #10B981; /* Το πράσινο των links */
+  font-size: 14px;
+  font-weight: 600;
+  transition: opacity 0.3s;
+}
+
+.seeAllBtn:hover {
+  opacity: 0.7;
+}
+
+.listCard {
+  background-color: #FFFFFF;
+  border-radius: 20px;
+  border: 1px solid #F1F5F9;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+}
+
+.loadingText {
+  padding: 20px;
+  text-align: center;
+  color: #64748B;
+  font-size: 14px;
+}
+
+.transactionRow {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  transition: background-color 0.2s ease;
+}
+
+.transactionRow:hover {
+  background-color: #F8FAFC;
+}
+
+/* Διαχωριστική γραμμή ανάμεσα στις εγγραφές */
+.borderBottom {
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.iconBox {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.details {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.txTitle {
+  margin: 0 0 4px 0;
+  color: #0F172A;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.txDate {
+  color: #64748B;
+  font-size: 13px;
+}
+
+.amountIncome {
+  color: #10B981; /* Πράσινο για έσοδα */
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.amountExpense {
+  color: #0F172A; /* Σκούρο για έξοδα */
+  font-size: 16px;
+  font-weight: 600;
+} 

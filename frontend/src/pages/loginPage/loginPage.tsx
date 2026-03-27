@@ -22,7 +22,7 @@ const LoginPage = () => {
   };
 
   const handleParentLogin = () => {
-    alert('Το περιβάλλον του γονιού είναι υπό κατασκευή!');
+    navigate('/parent-page'); 
   };
 
   return (

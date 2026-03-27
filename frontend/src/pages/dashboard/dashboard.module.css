@@ -1,0 +1,24 @@
+.dashboardContainer {
+  display: flex;
+  height: 100vh;
+  background-color: #F0F7F4; /* Το βασικό μας παστέλ background */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.mainContent {
+  flex-grow: 1; /* Πιάνει όλο τον υπόλοιπο χώρο στα δεξιά του μενού */
+  padding: 40px;
+  overflow-y: auto; /* Αν γεμίσει η σελίδα, να κάνει scroll μόνο το περιεχόμενο */
+}
+
+.header h1 {
+  color: #2A4B40;
+  font-size: 28px;
+  margin-bottom: 5px;
+}
+
+.header p {
+  color: #5C7C71;
+  font-size: 16px;
+  margin: 0;
+}

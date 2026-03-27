@@ -1,0 +1,88 @@
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background-color: #E6F2ED; /* Λίγο πιο σκούρο παστέλ από το γενικό background */
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 15px rgba(42, 75, 64, 0.03); /* Ελαφριά σκιά δεξιά */
+}
+
+.logoBox {
+  margin-bottom: 50px;
+  padding-left: 10px;
+}
+
+.logoTitle {
+  color: #2A4B40;
+  font-size: 26px;
+  margin: 0;
+}
+
+.logoSubtitle {
+  color: #5C7C71;
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.navLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-grow: 1; /* Σπρώχνει το προφίλ προς τα κάτω */
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #5C7C71;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 14px 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.icon {
+  margin-right: 15px;
+  font-size: 20px;
+}
+
+.link:hover {
+  background-color: #CDE4DB; /* Ένδειξη hover */
+  color: #2A4B40;
+  transform: translateX(5px); /* Μικρή κίνηση προς τα δεξιά */
+}
+
+.profileBox {
+  display: flex;
+  align-items: center;
+  background-color: #FAFDFB; /* Απαλό λευκό για αντίθεση */
+  padding: 15px;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(42, 75, 64, 0.04);
+}
+
+.profileAvatar {
+  font-size: 40px;
+  color: #5A9C86;
+  margin-right: 12px;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.childName {
+  color: #2A4B40;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.parentName {
+  color: #5C7C71;
+  font-size: 12px;
+  margin-top: 3px;
+}

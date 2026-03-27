@@ -4,47 +4,27 @@ import { FiGift, FiShoppingBag, FiDollarSign } from 'react-icons/fi';
 import { IoGameControllerOutline, IoFastFoodOutline } from 'react-icons/io5';
 import styles from './transactions.module.css';
 
-// Το Interface βασισμένο στη βάση δεδομένων σου
-interface Transaction {
-  id: string;
-  child_id: string;
-  title: string;
-  amount: string | number; // Η SQL πολλές φορές επιστρέφει τα decimals ως string
-  category: string;
-  type: 'income' | 'expense';
-  inserted_at: string;
-}
+interface Transaction { id: string; child_id: string; title: string; amount: string | number; category: string; type: 'income' | 'expense'; inserted_at: string; }
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const CHILD_ID = 'ΒΑΛΕ_ΤΟ_ID_ΤΟΥ_ΠΑΙΔΙΟΥ_ΕΔΩ';
 
-  // Κλήση στο backend για να τραβήξουμε τα δεδομένα
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        // Αντικατέστησε το URL με το πραγματικό endpoint του backend σου!
-        // π.χ. 'http://localhost:5000/api/transactions/child-id-εδώ'
-        const response = await fetch('/api/transactions/mock-child-id'); 
-        
-        if (!response.ok) throw new Error('Αποτυχία φόρτωσης');
-        const data = await response.json();
-        setTransactions(data);
+        const response = await fetch(`http://localhost:8000/api/children/${CHILD_ID}/transactions`);
+        if (response.ok) {
+          const data = await response.json();
+          setTransactions(data);
+        }
       } catch (error) {
         console.error("Σφάλμα:", error);
-        // Για να μπορείς να δεις το UI μέχρι να συνδέσεις το backend, βάζουμε mock data αν αποτύχει:
-        setTransactions([
-          { id: '1', child_id: '123', title: 'Χαρτζιλίκι από Μπαμπά', amount: 10.00, category: 'general', type: 'income', inserted_at: new Date().toISOString() },
-          { id: '2', child_id: '123', title: 'Βιβλιοπωλείο', amount: 4.50, category: 'shopping', type: 'expense', inserted_at: new Date(Date.now() - 86400000).toISOString() },
-          { id: '3', child_id: '123', title: 'Κυλικείο Σχολείου', amount: 2.00, category: 'food', type: 'expense', inserted_at: new Date(Date.now() - 86400000).toISOString() },
-          { id: '4', child_id: '123', title: 'Roblox', amount: 5.00, category: 'gaming', type: 'expense', inserted_at: new Date(Date.now() - 3 * 86400000).toISOString() },
-          { id: '5', child_id: '123', title: 'Δώρο Γιαγιάς', amount: 20.00, category: 'general', type: 'income', inserted_at: new Date(Date.now() - 5 * 86400000).toISOString() }
-        ]);
       } finally {
         setLoading(false);
       }
     };
-
     fetchTransactions();
   }, []);
 

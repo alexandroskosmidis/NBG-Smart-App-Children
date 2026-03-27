@@ -3,6 +3,8 @@ import Menu from '../../components/menu/menu';
 import Goals from '../../components/goals/goals';  
 import Transactions from '../../components/transactions/transactions';
 import styles from './dashboard.module.css';
+import SavingCard from '../../components/savingCard/savingCard';
+import Card from '../../components/card/card';
 
 
 const Dashboard = () => {
@@ -24,9 +26,16 @@ const Dashboard = () => {
           <h1>Πίνακας Ελέγχου</h1>
           <p>Γεια σου, {user.fullname}! 👋</p>
         </header>
+
+        <div className={styles.cardsContainer}>
+          <Card />
+          <SavingCard />
+        </div>
+        
         
         <Goals />
         <Transactions />
+
       </main>
     </div>
   );

@@ -1,71 +1,80 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaUser } from 'react-icons/fa';
 import styles from './parentPage.module.css';
 
-// Interfaces βάσει της SQL βάσης σου
-interface ParentProfile {
-  id: string;
-  parent_name: string;
-  email: string;
-}
-
-interface SpendingCap {
-  id: string;
-  category: string;
-  limit_amount: number;
-  current_spent: number;
-  period: string;
-}
+interface ParentProfile { id: string; parent_name: string; email: string; }
+interface SpendingCap { id: string; category: string; limit_amount: number; current_spent: number; period: string; }
 
 const ParentPage = () => {
-  // Mock Δεδομένα Γονέα (Από το INSERT σου)
-  const parent: ParentProfile = {
-    id: 'd6874e64-1621-4f9e-b851-4c1206c9e076',
-    parent_name: 'Γιώργος Παπαδόπουλος',
-    email: 'george@email.com'
-  };
+  const PARENT_ID = 'd6874e64-1621-4f9e-b851-4c1206c9e076'; // Προσωρινά καρφωτό
+  const CHILD_ID = 'f47ac10b-58cc-4372-a567-0e02b2c3d479'; // Βάλε το ID της Μαρίας
 
-  // Mock Δεδομένα Ορίων (Από το INSERT σου)
-  const [caps, setCaps] = useState<SpendingCap[]>([
-    { id: 'cap1', category: 'Gaming', limit_amount: 50.00, current_spent: 15.00, period: 'monthly' },
-    { id: 'cap2', category: 'Food', limit_amount: 30.00, current_spent: 12.00, period: 'monthly' }
-  ]);
+  const [parent, setParent] = useState<ParentProfile | null>(null);
+  const [caps, setCaps] = useState<SpendingCap[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // State για τη Φόρμα
-  const [formData, setFormData] = useState({
-    category: 'General',
-    limit_amount: '',
-    period: 'monthly'
-  });
+  const [formData, setFormData] = useState({ category: 'General', limit_amount: '', period: 'monthly' });
 
-  // Διαχείριση αλλαγών στη φόρμα
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Τραβάμε ταυτόχρονα το προφίλ και τα όρια από το backend μας
+        const [parentRes, capsRes] = await Promise.all([
+          fetch(`http://localhost:8000/api/parents/${PARENT_ID}`),
+          fetch(`http://localhost:8000/api/parents/${PARENT_ID}/caps`)
+        ]);
+
+        if (parentRes.ok) setParent(await parentRes.json());
+        if (capsRes.ok) setCaps(await capsRes.json());
+      } catch (error) {
+        console.error("Σφάλμα σύνδεσης με το backend:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Υποβολή φόρμας (Προσομοίωση αποθήκευσης στη βάση)
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.limit_amount) return;
 
-    const newCap: SpendingCap = {
-      id: Math.random().toString(), // Τυχαίο ID για το mock
-      category: formData.category,
-      limit_amount: parseFloat(formData.limit_amount),
-      current_spent: 0, // Ξεκινάει από 0
-      period: formData.period
-    };
+    try {
+      const response = await fetch('http://localhost:8000/api/caps', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          parent_id: PARENT_ID,
+          child_id: CHILD_ID,
+          category: formData.category,
+          limit_amount: parseFloat(formData.limit_amount),
+          period: formData.period
+        })
+      });
 
-    setCaps([...caps, newCap]);
-    setFormData({ ...formData, limit_amount: '' }); // Καθαρισμός πεδίου ποσού
-    alert('Το όριο αποθηκεύτηκε με επιτυχία!');
+      if (response.ok) {
+        const newCap = await response.json();
+        setCaps([...caps, newCap]); // Προσθήκη του νέου ορίου στη λίστα μας
+        setFormData({ ...formData, limit_amount: '' });
+        alert('Το όριο αποθηκεύτηκε!');
+      } else {
+        alert('Αποτυχία αποθήκευσης.');
+      }
+    } catch (error) {
+      console.error("Σφάλμα:", error);
+    }
   };
+
+  if (loading) return <div>Φόρτωση...</div>;
+  if (!parent) return <div>Δεν βρέθηκε προφίλ.</div>;
 
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        
-        {/* Κάρτα Προφίλ Γονέα */}
         <div className={styles.profileCard}>
           <FaUser className={styles.icon} />
           <div className={styles.profileInfo}>
@@ -75,80 +84,57 @@ const ParentPage = () => {
         </div>
 
         <div className={styles.dashboardGrid}>
-          {/* Φόρμα Δημιουργίας Νέου Ορίου */}
           <div className={styles.formCard}>
             <h3>Ορισμός Νέου Ορίου Κατανάλωσης</h3>
-            <p className={styles.subtitle}>Επίλεξε κατηγορία και ποσό για τη Μαρία Κ.</p>
-            
             <form onSubmit={handleSubmit} className={styles.form}>
-              <div className={styles.formGroup}>
-                <label>Κατηγορία</label>
+              <label>
+                Κατηγορία:
                 <select name="category" value={formData.category} onChange={handleChange}>
-                  <option value="General">Γενικά (General)</option>
-                  <option value="Gaming">Παιχνίδια (Gaming)</option>
-                  <option value="Food">Φαγητό (Food)</option>
-                  <option value="Shopping">Ψώνια (Shopping)</option>
+                  <option value="General">Γενικά</option>
+                  <option value="Gaming">Gaming</option>
+                  <option value="Shopping">Shopping</option>
+                  <option value="Food">Φαγητό</option>
                 </select>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Όριο Ποσού (€)</label>
-                <input 
-                  type="number" 
-                  name="limit_amount" 
-                  min="1" 
-                  step="0.5" 
-                  placeholder="π.χ. 20.50" 
-                  value={formData.limit_amount} 
-                  onChange={handleChange} 
-                  required 
+              </label>
+              <label>
+                Ποσό Ορίου (€):
+                <input
+                  type="number"
+                  name="limit_amount"
+                  value={formData.limit_amount}
+                  onChange={handleChange}
+                  min="0"
+                  step="0.01"
+                  required
                 />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Χρονική Περίοδος</label>
+              </label>
+              <label>
+                Περίοδος:
                 <select name="period" value={formData.period} onChange={handleChange}>
-                  <option value="daily">Ημερήσιο</option>
-                  <option value="weekly">Εβδομαδιαίο</option>
                   <option value="monthly">Μηνιαίο</option>
+                  <option value="weekly">Εβδομαδιαίο</option>
                 </select>
-              </div>
-
-              <button type="submit" className={styles.submitBtn}>Αποθήκευση Ορίου</button>
+              </label>
+              <button type="submit" className={styles.submitBtn}>Αποθήκευση</button>
             </form>
           </div>
 
-          {/* Λίστα με τα τρέχοντα όρια */}
           <div className={styles.capsListCard}>
-            <h3>Ενεργά Όρια της Μαρίας</h3>
+            <h3>Ενεργά Όρια</h3>
             <div className={styles.capsList}>
-              {caps.map(cap => (
+              {caps.length === 0 ? <p>Δεν υπάρχουν ενεργά όρια.</p> : caps.map(cap => (
                 <div key={cap.id} className={styles.capItem}>
-                  <div className={styles.capHeader}>
-                    <span className={styles.capCategory}>{cap.category}</span>
-                    <span className={styles.capPeriod}>
-                      {cap.period === 'monthly' ? 'Μήνα' : cap.period === 'weekly' ? 'Εβδομάδα' : 'Ημέρα'}
-                    </span>
+                  <div className={styles.capCategory}><b>Κατηγορία:</b> {cap.category}</div>
+                  <div className={styles.capAmounts}>
+                    <span><b>Όριο:</b> €{cap.limit_amount.toFixed(2)}</span>
+                    <span><b>Ξοδεύτηκαν:</b> €{cap.current_spent.toFixed(2)}</span>
                   </div>
-                  <div className={styles.capProgress}>
-                    <div className={styles.capAmounts}>
-                      <span>Ξόδεψε: €{cap.current_spent.toFixed(2)}</span>
-                      <span>Όριο: €{cap.limit_amount.toFixed(2)}</span>
-                    </div>
-                    {/* Απλή μπάρα προόδου */}
-                    <div className={styles.progressBar}>
-                      <div 
-                        className={styles.progressFill} 
-                        style={{ width: `${Math.min((cap.current_spent / cap.limit_amount) * 100, 100)}%` }}
-                      ></div>
-                    </div>
-                  </div>
+                  <div className={styles.capPeriod}><b>Περίοδος:</b> {cap.period === 'monthly' ? 'Μηνιαίο' : 'Εβδομαδιαίο'}</div>
                 </div>
               ))}
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

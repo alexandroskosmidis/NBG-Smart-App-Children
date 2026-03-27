@@ -1,0 +1,85 @@
+/* src/pages/loginPage/loginPage.module.css */
+
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  /* Το γενικό background - ένα πολύ απαλό, φωτεινό παστέλ πράσινο-μπλε (mint) */
+  background-color: #E6F2ED; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.loginBox {     
+  text-align: center;
+  background-color:  #F0F7F4; 
+  padding: 50px 40px;
+  border-radius: 24px;
+  box-shadow: 0 8px 20px rgba(42, 75, 64, 0.04); /* Απαλή σκιά στον τόνο του πράσινου */
+  max-width: 600px;
+  width: 100%;
+}
+
+.title {
+  color: #2A4B40; /* Σκούρο, κομψό πράσινο-μπλε για τον τίτλο */
+  margin-bottom: 10px;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: #5C7C71; /* Πιο απαλό πράσινο-γκρι για το υποστηρικτικό κείμενο */
+  margin-bottom: 40px;
+}
+
+.cardsWrapper {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.roleCard {
+  /* Οι κάρτες - ένα πολύ καθαρό λευκό με ελάχιστη υποψία πράσινου */
+  background-color: #FAFDFB; 
+  border: 2px solid #CDE4DB; /* Απαλό περίγραμμα στο χρώμα της μέντας */
+  border-radius: 18px;
+  padding: 30px 20px;
+  width: 200px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Το εφέ όταν περνάς το ποντίκι - Σκούρο παστέλ πράσινο-μπλε */
+.roleCard:hover {
+  border-color: #94C9B8; /* Πιο έντονο, αλλά πάντα παστέλ πράσινο-μπλε */
+  box-shadow: 0 8px 15px rgba(148, 201, 184, 0.25);
+  transform: translateY(-5px);
+}
+
+.icon {
+  font-size: 55px;
+  margin-bottom: 15px;
+  color: #5A9C86; /* Γλυκό πράσινο-μπλε (teal) χρώμα στα εικονίδια */
+  transition: all 0.3s ease;
+}
+
+/* Όταν γίνεται hover, το εικονίδιο γίνεται λίγο πιο σκούρο */
+.roleCard:hover .icon {
+  color: #3B7A65; 
+  transform: scale(1.1);
+}
+
+.roleCard h2 {
+  margin: 0;
+  color: #2A4B40;
+  font-size: 22px;
+}
+
+.roleCard p {
+  margin: 10px 0 0 0;
+  color: #5C7C71;
+  font-size: 14px;
+}

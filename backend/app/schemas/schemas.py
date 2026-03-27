@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
-from app.models import AgeGroup, LessonStatus
+from app.models.models import AgeGroup, LessonStatus
 
 
 # ──────────────────────────────────────────
@@ -45,9 +45,9 @@ class TokenOut(BaseModel):
 
 class QuizQuestion(BaseModel):
     question: str
-    options: list[str]       # 4 options
-    correct_index: int       # 0-3
-    explanation: str         # shown after answering
+    options: list[str]
+    correct_index: int
+    explanation: str
 
 
 class QuizOut(BaseModel):
@@ -62,12 +62,17 @@ class QuizOut(BaseModel):
 # Lesson Schemas
 # ──────────────────────────────────────────
 
+class LessonSection(BaseModel):
+    title: str
+    body: str
+    emoji: str | None = None
+
+
 class LessonContent(BaseModel):
-    """Structure of the JSON stored in Lesson.content"""
-    intro: str                   # short hook paragraph
-    sections: list[dict]         # [{title, body, emoji}]
-    key_takeaways: list[str]     # bullet points summary
-    fun_fact: str                # engaging fact for kids
+    intro: str
+    sections: list[LessonSection]
+    key_takeaways: list[str]
+    fun_fact: str
 
 
 class LessonOut(BaseModel):
@@ -79,7 +84,7 @@ class LessonOut(BaseModel):
     order_index: int
     xp_reward: int
     coin_reward: int
-    content: dict
+    content: LessonContent
     has_quiz: bool
 
     model_config = {"from_attributes": True}
@@ -111,15 +116,21 @@ class LessonProgressOut(BaseModel):
 
 
 class QuizSubmit(BaseModel):
-    """User sends their answers: list of chosen option indices"""
     answers: list[int]
 
 
+class QuizFeedbackItem(BaseModel):
+    question: str
+    your_answer: int
+    correct_answer: int
+    explanation: str
+
+
 class QuizResult(BaseModel):
-    score: float          # 0.0 - 1.0
+    score: float
     correct_count: int
     total_questions: int
     xp_earned: int
     coins_earned: int
-    passed: bool          # score >= 0.7
-    feedback: list[dict]  # [{question, your_answer, correct_answer, explanation}]
+    passed: bool
+    feedback: list[QuizFeedbackItem]

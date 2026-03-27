@@ -2,12 +2,11 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import Session, selectinload
 
-from app.auth import get_current_user
-from app.database import get_db
-from app.models import (
+from app.core.auth import get_current_user
+from app.db.database import get_db
+from app.models.models import (
     AgeGroup,
     Lesson,
     LessonProgress,
@@ -15,7 +14,7 @@ from app.models import (
     Quiz,
     User,
 )
-from app.schemas import (
+from app.schemas.schemas import (
     LessonListItem,
     LessonOut,
     LessonProgressOut,
@@ -23,22 +22,17 @@ from app.schemas import (
     QuizResult,
     QuizSubmit,
 )
-from app.services.gemini_service import generate_lesson_content, generate_quiz
+from app.services.lesson_service import generate_lesson_content, generate_quiz
 
 router = APIRouter(prefix="/lessons", tags=["Lessons"])
 
 
-# ──────────────────────────────────────────
-# GET /lessons/progress/me
-# Must be declared BEFORE /{lesson_id}
-# ──────────────────────────────────────────
-
 @router.get("/progress/me", response_model=list[LessonProgressOut])
-async def my_progress(
+def my_progress(
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
-    result = await db.execute(
+    result = db.execute(
         select(LessonProgress)
         .where(LessonProgress.user_id == current_user.id)
         .order_by(LessonProgress.lesson_id)
@@ -46,25 +40,13 @@ async def my_progress(
     return result.scalars().all()
 
 
-# ──────────────────────────────────────────
-# ADMIN / DEV: POST /lessons/generate
-# Must be declared BEFORE /{lesson_id}
-# ──────────────────────────────────────────
-
 @router.post("/generate", status_code=201)
 async def generate_lesson(
     topic: str,
     age_group_str: str,
     order_index: int = 0,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
-    """
-    Dev endpoint: asks Gemini to generate a lesson + quiz and saves them to DB.
-    Call this to seed your lessons table.
-
-    TODO:
-    Protect this route with admin auth before production exposure.
-    """
     try:
         age_group = AgeGroup(age_group_str)
     except ValueError:
@@ -85,7 +67,7 @@ async def generate_lesson(
         content=content,
     )
     db.add(lesson)
-    await db.flush()
+    db.flush()
 
     quiz = Quiz(lesson_id=lesson.id, questions=quiz_questions)
     db.add(quiz)
@@ -93,17 +75,12 @@ async def generate_lesson(
     return {"message": "Lesson generated!", "lesson_id": lesson.id}
 
 
-# ──────────────────────────────────────────
-# GET /lessons
-# ──────────────────────────────────────────
-
 @router.get("/", response_model=list[LessonListItem])
-async def list_lessons(
+def list_lessons(
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
-    """Returns all lessons for the logged-in user's age group, ordered."""
-    result = await db.execute(
+    result = db.execute(
         select(Lesson)
         .where(Lesson.age_group == current_user.age_group)
         .order_by(Lesson.order_index)
@@ -111,21 +88,16 @@ async def list_lessons(
     return result.scalars().all()
 
 
-# ──────────────────────────────────────────
-# GET /lessons/{lesson_id}
-# ──────────────────────────────────────────
-
 @router.get("/{lesson_id}", response_model=LessonOut)
-async def get_lesson(
+def get_lesson(
     lesson_id: int,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
-    lesson = await _get_lesson_or_404(lesson_id, db)
+    lesson = _get_lesson_or_404(lesson_id, db)
     _ensure_lesson_access(lesson, current_user, "μάθημα")
 
-    # Mark as in_progress only if not already completed
-    await _upsert_progress(
+    _upsert_progress(
         current_user.id,
         lesson_id,
         LessonStatus.IN_PROGRESS,
@@ -138,17 +110,13 @@ async def get_lesson(
     )
 
 
-# ──────────────────────────────────────────
-# GET /lessons/{lesson_id}/quiz
-# ──────────────────────────────────────────
-
 @router.get("/{lesson_id}/quiz", response_model=QuizOut)
-async def get_quiz(
+def get_quiz(
     lesson_id: int,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
-    lesson = await _get_lesson_or_404(lesson_id, db)
+    lesson = _get_lesson_or_404(lesson_id, db)
     _ensure_lesson_access(lesson, current_user, "quiz")
 
     if lesson.quiz is None:
@@ -157,18 +125,14 @@ async def get_quiz(
     return lesson.quiz
 
 
-# ──────────────────────────────────────────
-# POST /lessons/{lesson_id}/quiz/submit
-# ──────────────────────────────────────────
-
 @router.post("/{lesson_id}/quiz/submit", response_model=QuizResult)
-async def submit_quiz(
+def submit_quiz(
     lesson_id: int,
     payload: QuizSubmit,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
-    lesson = await _get_lesson_or_404(lesson_id, db)
+    lesson = _get_lesson_or_404(lesson_id, db)
     _ensure_lesson_access(lesson, current_user, "quiz")
 
     if lesson.quiz is None:
@@ -182,7 +146,7 @@ async def submit_quiz(
             detail=f"Αναμένονται {len(questions)} απαντήσεις.",
         )
 
-    existing_progress = await _get_progress(current_user.id, lesson_id, db)
+    existing_progress = _get_progress(current_user.id, lesson_id, db)
 
     already_completed = (
         existing_progress is not None
@@ -195,7 +159,6 @@ async def submit_quiz(
         and existing_progress.status != LessonStatus.COMPLETED
     )
 
-    # Grade the quiz
     correct_count = 0
     feedback = []
 
@@ -237,19 +200,17 @@ async def submit_quiz(
 
     score = correct_count / len(questions)
     passed = score >= 0.7
-
-    # Reward policy:
-    # - Completed lesson: no more rewards
-    # - First failed graded attempt: quarter XP
-    # - Later successful pass after a failed attempt: remaining XP + full coins
-    # - First successful pass: full XP + full coins
     fail_xp = lesson.xp_reward // 4
 
     if already_completed:
         xp_earned = 0
         coins_earned = 0
     elif passed:
-        xp_earned = lesson.xp_reward if not has_previous_graded_attempt else max(lesson.xp_reward - fail_xp, 0)
+        xp_earned = (
+            lesson.xp_reward
+            if not has_previous_graded_attempt
+            else max(lesson.xp_reward - fail_xp, 0)
+        )
         coins_earned = lesson.coin_reward
     else:
         xp_earned = fail_xp if not has_previous_graded_attempt else 0
@@ -258,7 +219,7 @@ async def submit_quiz(
     current_user.xp += xp_earned
     current_user.coins += coins_earned
 
-    await _upsert_progress(
+    _upsert_progress(
         current_user.id,
         lesson_id,
         LessonStatus.COMPLETED if passed else LessonStatus.IN_PROGRESS,
@@ -278,10 +239,6 @@ async def submit_quiz(
     )
 
 
-# ──────────────────────────────────────────
-# Helpers
-# ──────────────────────────────────────────
-
 def _ensure_lesson_access(lesson: Lesson, current_user: User, resource_name: str) -> None:
     if lesson.age_group != current_user.age_group:
         raise HTTPException(
@@ -290,8 +247,8 @@ def _ensure_lesson_access(lesson: Lesson, current_user: User, resource_name: str
         )
 
 
-async def _get_lesson_or_404(lesson_id: int, db: AsyncSession) -> Lesson:
-    result = await db.execute(
+def _get_lesson_or_404(lesson_id: int, db: Session) -> Lesson:
+    result = db.execute(
         select(Lesson)
         .options(selectinload(Lesson.quiz))
         .where(Lesson.id == lesson_id)
@@ -302,12 +259,12 @@ async def _get_lesson_or_404(lesson_id: int, db: AsyncSession) -> Lesson:
     return lesson
 
 
-async def _get_progress(
+def _get_progress(
     user_id: int,
     lesson_id: int,
-    db: AsyncSession,
+    db: Session,
 ) -> LessonProgress | None:
-    result = await db.execute(
+    result = db.execute(
         select(LessonProgress).where(
             LessonProgress.user_id == user_id,
             LessonProgress.lesson_id == lesson_id,
@@ -316,18 +273,17 @@ async def _get_progress(
     return result.scalar_one_or_none()
 
 
-async def _upsert_progress(
+def _upsert_progress(
     user_id: int,
     lesson_id: int,
     status: LessonStatus,
-    db: AsyncSession,
+    db: Session,
     quiz_score: float | None = None,
     completed_at: datetime | None = None,
 ):
-    progress = await _get_progress(user_id, lesson_id, db)
+    progress = _get_progress(user_id, lesson_id, db)
 
     if progress:
-        # Never downgrade COMPLETED -> IN_PROGRESS
         if progress.status != LessonStatus.COMPLETED:
             progress.status = status
 
